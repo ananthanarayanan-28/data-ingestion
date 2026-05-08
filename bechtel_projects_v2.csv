@@ -1,0 +1,21 @@
+project_id,project_code,project_name,prj_type,prj_site_city,prj_site_state,prj_site_country,prj_total_contract_value,prj_client_name,prj_is_epc,prj_contract_type,prj_status,prj_planned_start_date,prj_planned_end_date,prj_original_budget,prj_revised_budget,prj_actual_start_date
+PROJ-LNG-001,BEC-LNG-WLA,Woodside Louisiana LNG Terminal Ph1&2,lng,Sulphur,LA,USA,14900000000,Woodside Energy,1,lump_sum,active,2022-03-01,2029-07-28,13351304497,16970479700,2022-05-21
+PROJ-LNG-002,BEC-LNG-RG1,Rio Grande LNG Phase 1 Trains 1-3,lng,Brownsville,TX,USA,12000000000,NextDecade Corporation,1,lump_sum,active,2023-01-01,2028-06-28,10946366355,13213817316,2023-03-05
+PROJ-LNG-003,BEC-LNG-RG4,Rio Grande LNG Train 4,lng,Brownsville,TX,USA,4770000000,NextDecade Corporation,1,lump_sum,active,2024-05-01,2029-12-28,4398355821,5296457827,2024-07-18
+PROJ-LNG-004,BEC-LNG-RG5,Rio Grande LNG Train 5,lng,Brownsville,TX,USA,4320000000,NextDecade Corporation,1,lump_sum,active,2024-03-01,2029-11-28,3949374287,4649415888,2024-03-31
+PROJ-LNG-005,BEC-LNG-PA1,Port Arthur LNG Phase 1,lng,Port Arthur,TX,USA,10000000000,Sempra Infrastructure,1,lump_sum,active,2022-06-01,2027-12-28,9188911782,10552263837,2022-06-03
+PROJ-LNG-006,BEC-LNG-PA2,Port Arthur LNG Phase 2,lng,Port Arthur,TX,USA,8500000000,Sempra Infrastructure,1,lump_sum,active,2025-06-01,2030-06-28,8124710188,9375975807,2025-06-26
+PROJ-NUC-001,BEC-NUC-VGL,Plant Vogtle Units 3 & 4,nuclear_power,Waynesboro,GA,USA,7000000000,Georgia Power,1,lump_sum,active,2013-06-01,2024-12-28,6389880894,8380795047,2013-08-24
+PROJ-NUC-002,BEC-NUC-STR,Sizewell C Nuclear Power Station,nuclear_power,Suffolk,SUF,UK,20000000000,EDF Energy,1,lump_sum,active,2024-02-01,2035-09-28,18595436332,21522949372,2024-03-29
+PROJ-MIN-001,BEC-MIN-QBC,Quebrada Blanca Phase 2 Copper Mine,mining,Tarapaca Region,I,Chile,5300000000,Teck Resources,1,lump_sum,active,2020-01-01,2024-12-28,4987582778,6110834165,2020-02-02
+PROJ-MIN-002,BEC-MIN-EVA,Eva Copper Mine EPC Queensland,mining,Cloncurry,QLD,Australia,1200000000,Harmony Gold,1,lump_sum,active,2024-06-01,2027-09-28,1091227121,1349633153,2024-07-11
+PROJ-MIN-003,BEC-MIN-THP,Thacker Pass Lithium Mine EPCM,mining,Humboldt County,NV,USA,2300000000,Lithium Americas,1,lump_sum,active,2023-01-01,2027-12-28,2103219634,2610727851,2023-01-03
+PROJ-INF-001,BEC-INF-WSA,Western Sydney International Airport,infrastructure,Badgerys Creek,NSW,Australia,5000000000,WSA Co,1,lump_sum,active,2020-03-01,2026-12-28,4658519181,5565048465,2020-04-25
+PROJ-INF-002,BEC-INF-LIZ,Elizabeth Line Crossrail London,infrastructure,London,LDN,UK,3600000000,Crossrail Ltd,1,lump_sum,completed,2012-06-01,2022-11-28,3409443393,4320409005,2012-07-27
+PROJ-INF-003,BEC-INF-RYD,Riyadh Metro Project,infrastructure,Riyadh,RD,Saudi Arabia,8000000000,Arriyadh Development Authority,1,lump_sum,completed,2015-03-01,2021-07-28,7113753453,8565863269,2015-05-27
+PROJ-ENV-001,BEC-ENV-HAN,Hanford Waste Treatment Plant,environmental,Richland,WA,USA,17000000000,US Dept of Energy,1,lump_sum,active,2001-02-01,2030-12-28,15665475298,21057321725,2001-04-29
+PROJ-ENV-002,BEC-ENV-UPF,Uranium Processing Facility Y-12,environmental,Oak Ridge,TN,USA,6500000000,NNSA,1,lump_sum,active,2014-01-01,2030-12-28,5795261300,8051509697,2014-02-23
+PROJ-MFG-001,BEC-MFG-INT,Intel Semiconductor Fab Ohio,manufacturing,New Albany,OH,USA,20000000000,Intel Corporation,1,lump_sum,active,2022-04-01,2026-11-28,17648926921,24803238735,2022-06-12
+PROJ-MFG-002,BEC-MFG-BAT,Battery Manufacturing Facility,manufacturing,Nashville,TN,USA,800000000,Confidential Client,1,lump_sum,active,2023-02-01,2025-12-28,734221637,887504543,2023-04-16
+PROJ-PWR-001,BEC-PWR-CVE,Cricket Valley Energy CCPP 1100MW,power,Dover,NY,USA,1100000000,Cricket Valley Energy,1,lump_sum,completed,2018-05-01,2020-11-28,1001634730,1341451102,2018-07-23
+PROJ-REN-001,BEC-REN-CCS,Cold Creek Solar Storage 430MW,renewables,Lincoln County,NV,USA,750000000,Doral Renewables,1,lump_sum,active,2024-04-01,2026-10-28,670245435,845311798,2024-04-19
