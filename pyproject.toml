@@ -7,4 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "clickhouse-driver>=0.2.10",
     "faker>=40.15.0",
+    "langfuse>=4.0.0",
+    "opentelemetry-exporter-otlp-proto-http>=1.25.0",
+    "opentelemetry-sdk>=1.25.0",
 ]

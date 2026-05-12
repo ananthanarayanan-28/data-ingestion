@@ -1,89 +1,148 @@
-# Bechtel → ClickHouse Data Ingestion
+# Bechtel Invoice Data — ClickHouse Ingestion
 
-Inserts Bechtel invoice CSV data into the `con_master_fact` ClickHouse table (405 columns).
+Loads `bechtel_invoices_fully_enriched.csv` (405 columns, ~9,800 rows) into
+`invoice_extraction.con_master_fact`.
 
-## Prerequisites
+---
 
-**Python packages**
-```bash
-pip install clickhouse-driver pandas
-```
-
-**ClickHouse via Docker**
-
-The project expects ClickHouse running with these port mappings:
-- `9001` → native TCP (used by `clickhouse-driver`)
-- `8124` → HTTP interface
+## Step 1 — Start ClickHouse
 
 ```bash
-docker run -d \
-  --name gangster-clickhouse \
+docker run -d --name clickhouse \
   -p 9001:9000 \
   -p 8124:8123 \
   -e CLICKHOUSE_USER=admin \
   -e CLICKHOUSE_PASSWORD=admin123 \
-  -e CLICKHOUSE_DB=invoice_extraction \
-  clickhouse/clickhouse-server:24.3
+  -e CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1 \
+  clickhouse/clickhouse-server:latest
 ```
 
-Verify it's healthy:
-```bash
-docker ps | grep clickhouse
-```
+---
 
-## Running the Script
+## Step 2 — Create Database and Table
 
-**Default run (uses `bechtel_invoices_v2.csv`)**
 ```bash
-python insert_to_clickhouse.py --csv bechtel_invoices_v2.csv
-```
-
-**Dry run — parses and prints 2 rows, no insert**
-```bash
-python insert_to_clickhouse.py --csv bechtel_invoices_v2.csv --dry-run
-```
-
-**Custom connection**
-```bash
-python insert_to_clickhouse.py \
-  --csv bechtel_invoices_v2.csv \
+clickhouse client \
   --host localhost \
   --port 9001 \
   --user admin \
   --password admin123 \
+  --query="CREATE DATABASE IF NOT EXISTS invoice_extraction"
+```
+
+```bash
+clickhouse client \
+  --host localhost \
+  --port 9001 \
+  --user admin \
+  --password admin123 \
+  --database invoice_extraction \
+  --queries-file construction_schema/con_master_fact.sql
+```
+
+---
+
+## Step 3 — Insert the CSV
+
+```bash
+clickhouse client \
+  --host localhost \
+  --port 9001 \
+  --user admin \
+  --password admin123 \
+  --database invoice_extraction \
+  --query="INSERT INTO con_master_fact FORMAT CSVWithNames" \
+  < bechtel_invoices_fully_enriched.csv
+```
+
+> `CSVWithNames` reads the header row from the file and maps columns by name automatically.
+
+---
+
+## Verify
+
+```bash
+clickhouse client \
+  --host localhost \
+  --port 9001 \
+  --user admin \
+  --password admin123 \
+  --database invoice_extraction \
+  --query="SELECT count() FROM con_master_fact FINAL"
+```
+
+Expected output: `9804`
+
+---
+
+## Sample Queries
+
+```sql
+-- Spend by vendor
+SELECT vnd_vendor_name_normalized,
+       round(sum(inv_total_amount) / 1e6, 2) AS spend_usd_m
+FROM invoice_extraction.con_master_fact FINAL
+GROUP BY vnd_vendor_name_normalized
+ORDER BY spend_usd_m DESC
+LIMIT 10;
+
+-- Spend by EPC category
+SELECT inv_li_epc_category,
+       count()                                AS line_items,
+       round(sum(inv_total_amount) / 1e6, 2)  AS spend_usd_m
+FROM invoice_extraction.con_master_fact FINAL
+GROUP BY inv_li_epc_category
+ORDER BY spend_usd_m DESC;
+
+-- Overdue invoices
+SELECT invoice_id, inv_invoice_date, pmt_overdue_days, inv_total_amount
+FROM invoice_extraction.con_master_fact FINAL
+WHERE pmt_overdue_flag = 1
+ORDER BY pmt_overdue_days DESC;
+```
+
+> Always use `FINAL` — the table uses `ReplacingMergeTree` which deduplicates by
+> `(transaction_id, line_item_id)` at query time when `FINAL` is specified.
+
+---
+
+## Python Insert (alternative)
+
+If the `clickhouse client` binary is not available, use the Python script:
+
+```bash
+pip install clickhouse-driver
+python insert_to_clickhouse.py --csv bechtel_invoices_fully_enriched.csv
+```
+
+Connection defaults are in `constants.py`. Override at runtime:
+
+```bash
+python insert_to_clickhouse.py \
+  --csv bechtel_invoices_fully_enriched.csv \
+  --host localhost --port 9001 \
+  --user admin --password admin123 \
   --database invoice_extraction
 ```
 
-### All Options
+---
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--csv` | `bechtel_invoices_v2.csv` | Path to the invoices CSV |
-| `--host` | `localhost` | ClickHouse host |
-| `--port` | `9001` | ClickHouse **native TCP** port (not the HTTP port) |
-| `--user` | `admin` | ClickHouse user |
-| `--password` | `admin123` | ClickHouse password |
-| `--database` | `invoice_extraction` | Target database |
-| `--table` | `con_master_fact` | Target table |
-| `--batch` | `500` | Rows per insert batch |
-| `--dry-run` | off | Preview rows without inserting |
+## Files
 
-## What the Script Does
+| File | Purpose |
+|---|---|
+| `bechtel_invoices_fully_enriched.csv` | Source data — 405 columns, ~9,800 rows |
+| `construction_schema/con_master_fact.sql` | Table DDL + materialized views |
+| `insert_to_clickhouse.py` | Python insert script (alternative) |
+| `constants.py` | ClickHouse connection defaults |
 
-1. Reads the CSV (63 extracted columns)
-2. Casts and expands every row to all 405 columns (remaining columns default to NULL/0)
-3. Sorts rows by `inv_invoice_date` to minimise partition spread per batch
-4. Inserts in batches of 500 rows into `con_master_fact`
-5. Creates the table automatically if it doesn't exist (reads `construction_schema/con_master_fact.sql`)
-6. Runs verification queries after insert
+---
 
 ## Common Errors
 
-**`Unexpected packet from server` on connect**
-You're hitting the HTTP port (8124) instead of the native TCP port. Use `--port 9001`.
-
-**`Too many partitions for single INSERT block`**
-The data spans too many invoice-date months in one batch. This is already handled by sorting rows before insert and passing `max_partitions_per_insert_block=1000` per query. If it still occurs, reduce `--batch` to 100.
-
-**`Table con_master_fact not found`**
-The script will auto-create it from `construction_schema/con_master_fact.sql`. Make sure that file exists before running.
+| Error | Cause | Fix |
+|---|---|---|
+| `Connection refused` | ClickHouse not running or wrong port | Check Docker is up; use `--port 9001` for Docker host mapping |
+| `authentication failed` | Wrong credentials | Match `--user` / `--password` to your Docker `-e` flags |
+| `Table doesn't exist` | Schema not created yet | Run Step 2 first |
+| `Too many partitions` (Python only) | Wide date range per batch | Already handled in Python script — script sorts by date |
