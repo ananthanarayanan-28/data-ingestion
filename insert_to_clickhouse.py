@@ -438,8 +438,6 @@ COLUMNS = {
     "ext_rolling_3m_avg":          ("float",    None),
     "ext_rolling_12m_avg":         ("float",    None),
     "ext_price_volatility":        ("float",    None),
-    "ext_rolling_3m_avg":          ("float",    None),
-    "ext_rolling_12m_avg":         ("float",    None),
     "ext_forex_rate":              ("float",    None),
     "ext_wpi_index":               ("float",    None),
 
