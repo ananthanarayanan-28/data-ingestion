@@ -771,6 +771,7 @@ def main():
             user=args.user,
             password=args.password,
             database=args.database,
+            secure=False,
             settings={"use_client_time_zone": True},
         )
         version = client.execute("SELECT version()")[0][0]
